@@ -10,8 +10,8 @@ const create = (data) => {
   return data;
 };
 
-const remove = (id) => {
-  tasks = tasks.filter((item) => item.id !== id);
+const remove = (id, column = 'id') => {
+  tasks = tasks.filter((item) => item[column] !== id);
 };
 
 const update = (id, data) => {
