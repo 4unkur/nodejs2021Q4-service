@@ -1,61 +1,50 @@
-// const User = require('./user.model');
-// const usersService = require('./user.service');
-const { v4: uuidv4 } = require('uuid');
-
-let users = [];
+const User = require('./user.model');
+const usersService = require('./user.service');
 
 const getUsers = (req, reply) => {
-  reply.send(users);
+  reply.send(usersService.getAll());
 };
 
 const getUser = (req, reply) => {
   const { id } = req.params;
 
-  const user = users.find((record) => record.id === id);
+  const user = usersService.getById(id)
 
   reply.send(user);
 };
 
 const addUser = (req, reply) => {
-  const { name, login, password } = req.body;
-  const user = {
-    id: uuidv4(),
-    name,
-    login,
-    password
-  };
+  const user = usersService.create(new User(req.body))
 
-  users = [...users, user];
-
-  reply.code(201).send(user);
+  reply.code(201).send(User.toResponse(user));
 };
 
 const deleteUser = (req, reply) => {
   const { id } = req.params;
 
-  users = users.filter((item) => item.id !== id);
+  usersService.remove(id)
 
   reply.send({ message: `Item ${id} has been removed` });
 };
 
 const updateUser = (req, reply) => {
   const { id } = req.params;
-  const { name, login, password } = req.body;
 
-  const index = users.findIndex(record => record.id === id);
-  if (index === -1) {
+  const record = usersService.getById(id)
+
+  if (!record) {
     reply.code(404).send({ message: 'Not found' });
     return;
   }
+  const updatedUser = new User({id, ...req.body})
 
-  const updatedUser = { id, name, login, password: password || password };
-  users[index] = updatedUser;
+  usersService.update(id, updatedUser)
 
   reply.send(updatedUser);
 };
 
 // Item schema
-const User = {
+const UserSchema = {
   type: 'object',
   properties: {
     id: { type: 'string' },
@@ -70,7 +59,7 @@ const getUsersOpts = {
     response: {
       200: {
         type: 'array',
-        items: User,
+        items: UserSchema,
       },
     },
   },
@@ -80,7 +69,7 @@ const getUsersOpts = {
 const getUserOpts = {
   schema: {
     response: {
-      200: User,
+      200: UserSchema,
     },
   },
   handler: getUser,
@@ -98,7 +87,7 @@ const postUserOpts = {
       },
     },
     response: {
-      201: User,
+      201: UserSchema,
     },
   },
   handler: addUser,
@@ -121,7 +110,7 @@ const deleteUserOpts = {
 const updateUserOpts = {
   schema: {
     response: {
-      200: User,
+      200: UserSchema,
     },
   },
   handler: updateUser,
