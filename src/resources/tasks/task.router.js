@@ -1,99 +1,115 @@
 const Task = require('./task.model');
 const taskService = require('./task.service');
 
-const getUsers = (req, reply) => {
-  reply.send(taskService.getAll());
+const getTasks = (req, reply) => {
+  const { boardId } = req.params;
+
+  reply.send(taskService.getAll(boardId));
 };
 
-const getUser = (req, reply) => {
-  const { id } = req.params;
+const getTask = (req, reply) => {
+  const { taskId } = req.params;
 
-  const user = taskService.getById(id)
+  const task = taskService.getById(taskId);
 
-  reply.send(user);
+  if (!task) {
+    reply.code(404).send({ message: 'Not found' });
+    return;
+  }
+
+  reply.send(task);
 };
 
-const addUser = (req, reply) => {
-  const user = taskService.create(new Task(req.body))
+const addTask = (req, reply) => {
+  const { boardId } = req.params;
 
-  reply.code(201).send(Task.toResponse(user));
+  const task = taskService.create(new Task({ ...req.body, boardId }));
+
+  reply.code(201).send(task);
 };
 
-const deleteUser = (req, reply) => {
-  const { id } = req.params;
+const deleteTask = (req, reply) => {
+  const { taskId } = req.params;
 
-  taskService.remove(id)
+  taskService.remove(taskId);
 
-  reply.send({ message: `Item ${id} has been removed` });
+  reply.send({ message: `Item ${taskId} has been removed` });
 };
 
-const updateUser = (req, reply) => {
-  const { id } = req.params;
+const updateTask = (req, reply) => {
+  const { taskId } = req.params;
 
-  const record = taskService.getById(id)
+  const record = taskService.getById(taskId);
 
   if (!record) {
     reply.code(404).send({ message: 'Not found' });
     return;
   }
-  const updatedUser = new Task({id, ...req.body})
+  const updatedTask = new Task({ ...req.body, taskId });
 
-  taskService.update(id, updatedUser)
+  taskService.update(taskId, updatedTask);
 
-  reply.send(updatedUser);
+  reply.send(updatedTask);
 };
 
 // Item schema
-const UserSchema = {
+const TaskSchema = {
   type: 'object',
   properties: {
     id: { type: 'string' },
-    name: { type: 'string' },
-    login: { type: 'string' }
+    title: { type: 'string' },
+    description: { type: 'string' },
+    userId: { type: 'number', nullable: true },
+    boardId: { type: 'string' },
+    columnId: { type: 'number', nullable: true },
+    order: { type: 'number' }
   },
 };
 
 // Options for get all items
-const getUsersOpts = {
+const getTasksOpts = {
   schema: {
     response: {
       200: {
         type: 'array',
-        items: UserSchema,
+        items: TaskSchema,
       },
     },
   },
-  handler: getUsers,
+  handler: getTasks,
 };
 
-const getUserOpts = {
+const getTaskOpts = {
   schema: {
     response: {
-      200: UserSchema,
+      200: TaskSchema,
     },
   },
-  handler: getUser,
+  handler: getTask,
 };
 
-const postUserOpts = {
+const postTaskOpts = {
   schema: {
     body: {
       type: 'object',
-      required: ['name', 'login', 'password'],
+      required: ['title', 'description', 'userId', 'boardId', 'columnId'],
       properties: {
-        name: { type: 'string' },
-        login: { type: 'string' },
-        password: { type: 'string' },
+        title: { type: 'string' },
+        description: { type: 'string' },
+        userId: { type: 'number', nullable: true },
+        boardId: { type: 'string' },
+        columnId: { type: 'number', nullable: true },
+        order: { type: 'number' }
       },
     },
     response: {
-      201: UserSchema,
+      201: TaskSchema,
     },
   },
-  handler: addUser,
+  handler: addTask,
 };
 
-const deleteUserOpts = {
+const deleteTaskOpts = {
   schema: {
     response: {
       200: {
@@ -104,24 +120,24 @@ const deleteUserOpts = {
       },
     },
   },
-  handler: deleteUser,
+  handler: deleteTask,
 };
 
-const updateUserOpts = {
+const updateTaskOpts = {
   schema: {
     response: {
-      200: UserSchema,
+      200: TaskSchema,
     },
   },
-  handler: updateUser,
+  handler: updateTask,
 };
 
 function router(fastify, options, done) {
-  fastify.get('/users', getUsersOpts);
-  fastify.get('/users/:id', getUserOpts);
-  fastify.post('/users', postUserOpts);
-  fastify.delete('/users/:id', deleteUserOpts);
-  fastify.put('/users/:id', updateUserOpts);
+  fastify.get('/boards/:boardId/tasks', getTasksOpts);
+  fastify.get('/boards/:boardId/tasks/:taskId', getTaskOpts);
+  fastify.post('/boards/:boardId/tasks', postTaskOpts);
+  fastify.delete('/boards/:boardId/tasks/:taskId', deleteTaskOpts);
+  fastify.put('/boards/:boardId/tasks/:taskId', updateTaskOpts);
   done();
 }
 

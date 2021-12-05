@@ -1,8 +1,8 @@
 let tasks = [];
 
-const getAll = () => tasks;
+const getAll = (boardId) => tasks.filter(task => task.boardId === boardId);
 
-const getById = (id) => tasks.find((record) => record.id === id);
+const getById = (taskId) => tasks.find((record) => record.id === taskId);
 
 const create = (data) => {
   tasks = [...tasks, data];
