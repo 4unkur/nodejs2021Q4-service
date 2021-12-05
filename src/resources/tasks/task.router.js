@@ -59,9 +59,9 @@ const TaskSchema = {
     id: { type: 'string' },
     title: { type: 'string' },
     description: { type: 'string' },
-    userId: { type: 'number', nullable: true },
+    userId: { type: 'string', nullable: true },
     boardId: { type: 'string' },
-    columnId: { type: 'number', nullable: true },
+    columnId: { type: 'string', nullable: true },
     order: { type: 'number' }
   },
 };
@@ -92,13 +92,12 @@ const postTaskOpts = {
   schema: {
     body: {
       type: 'object',
-      required: ['title', 'description', 'userId', 'boardId', 'columnId'],
       properties: {
         title: { type: 'string' },
         description: { type: 'string' },
-        userId: { type: 'number', nullable: true },
+        userId: { type: 'string', nullable: true },
         boardId: { type: 'string' },
-        columnId: { type: 'number', nullable: true },
+        columnId: { type: 'string', nullable: true },
         order: { type: 'number' }
       },
     },

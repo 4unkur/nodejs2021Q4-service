@@ -25,4 +25,8 @@ const update = (id, data) => {
   return true;
 };
 
-module.exports = { getAll, getById, create, remove, update };
+const updateBulk = (condition, data) => {
+  tasks = tasks.map(task => task[condition.column] === condition.value ? { ...task, ...data } : task);
+};
+
+module.exports = { getAll, getById, create, remove, update, updateBulk };

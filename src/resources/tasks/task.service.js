@@ -10,6 +10,8 @@ const remove = (id) => taskRepo.remove(id)
 
 const removeByBoardId = (boardId) => taskRepo.remove(boardId, 'boardId')
 
+const unnasignUser = (userId) => taskRepo.updateBulk({column: 'userId', value: userId}, {userId: null})
+
 const update = (id, data) => taskRepo.update(id, data)
 
-module.exports = { getAll, getById, create, remove, update, removeByBoardId };
+module.exports = { getAll, getById, create, remove, update, removeByBoardId, unnasignUser };

@@ -79,7 +79,6 @@ const postUserOpts = {
   schema: {
     body: {
       type: 'object',
-      required: ['name', 'login', 'password'],
       properties: {
         name: { type: 'string' },
         login: { type: 'string' },
