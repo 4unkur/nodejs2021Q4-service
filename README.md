@@ -14,7 +14,7 @@ git clone https://github.com/4unkur/nodejs2021Q4-service.git
 ## Installing NPM modules
 
 ```
-cd nodejs2021Q4-service.git
+cd nodejs2021Q4-service
 npm install
 ```
 
